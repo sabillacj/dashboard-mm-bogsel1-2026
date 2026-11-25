@@ -1,0 +1,1935 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Kondisi Muda-Mudi Daerah Bogor Selatan 1 (Tahun 2026)</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              teal: '#0F766E',
+              tealDark: '#115E59',
+              emerald: '#059669',
+              slateDark: '#0F172A',
+              slateBg: '#F8FAFC',
+              blue: '#2563EB',
+              amber: '#D97706',
+              rose: '#E11D48',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Chart.js v4 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #F8FAFC;
+      color: #0F172A;
+    }
+
+    /* Custom subtle scrollbar for tables */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #F1F5F9;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+
+    /* Print / PDF Executive Styling */
+    @media print {
+      body {
+        background-color: #FFFFFF !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-break-inside-avoid {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      .print-block {
+        display: block !important;
+      }
+      header {
+        background: #0F766E !important;
+        color: #FFFFFF !important;
+        padding: 1.25rem !important;
+        border-radius: 0.75rem !important;
+      }
+      canvas {
+        max-width: 100% !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#F8FAFC] text-[#0F172A] antialiased selection:bg-teal-700 selection:text-white">
+
+  <!-- Toast Notification Banner (No alert() used) -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none no-print"></div>
+
+  <!-- Executive Gradient Header -->
+  <header class="bg-gradient-to-r from-[#0F766E] via-[#0D6E66] to-[#065F46] text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+        <!-- Title & Subtitle -->
+        <div class="space-y-2">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 text-xs font-semibold tracking-wide uppercase text-teal-50">
+            <span class="w-2 h-2 rounded-full bg-emerald-300 animate-pulse"></span>
+            Laporan Eksekutif Tingkat Pusat • Tahun 2026
+          </div>
+          <h1 class="text-2xl sm:text-3xl lg:text-[32px] font-extrabold tracking-tight leading-tight text-white">
+            Dashboard Kondisi Muda-Mudi Daerah Bogor Selatan 1
+          </h1>
+          <p class="text-sm sm:text-base text-teal-100/95 max-w-3xl font-normal">
+            Pemetaan Demografi, Aktivitas Pendidikan &amp; Karier, Kesiapan Pra-Nikah, serta Minat Bakat (8 Desa • 44 Kelompok)
+          </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center gap-3 no-print shrink-0">
+          <button
+            id="btnExportGlobalCSV"
+            type="button"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white text-[#0F766E] hover:bg-teal-50 active:scale-[0.99] font-semibold text-sm shadow-sm transition-all cursor-pointer"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            <span>Unduh Rekap CSV</span>
+          </button>
+
+          <button
+            id="btnPrintPDF"
+            type="button"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-teal-950/45 hover:bg-teal-950/65 text-white border border-white/25 active:scale-[0.99] font-semibold text-sm shadow-sm transition-all cursor-pointer"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            <span>Cetak / PDF Laporan</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- Interactive Filter Bar -->
+    <section aria-label="Filter Wilayah" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-5 no-print">
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 flex-1">
+          <!-- Filter Desa -->
+          <div>
+            <label for="filterDesa" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+              Filter Wilayah Desa (8 Desa)
+            </label>
+            <div class="relative">
+              <select
+                id="filterDesa"
+                class="w-full appearance-none rounded-xl border border-slate-300 bg-slate-50/70 hover:bg-white focus:bg-white px-3.5 py-2.5 pr-10 text-sm font-medium text-slate-800 focus:border-[#0F766E] focus:outline-none focus:ring-2 focus:ring-teal-600/20 transition"
+              >
+                <option value="ALL">Semua Desa (8 Desa)</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter Kelompok -->
+          <div>
+            <label for="filterKelompok" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">
+              Filter Kelompok (44 Kelompok)
+            </label>
+            <div class="relative">
+              <select
+                id="filterKelompok"
+                class="w-full appearance-none rounded-xl border border-slate-300 bg-slate-50/70 hover:bg-white focus:bg-white px-3.5 py-2.5 pr-10 text-sm font-medium text-slate-800 focus:border-[#0F766E] focus:outline-none focus:ring-2 focus:ring-teal-600/20 transition"
+              >
+                <option value="ALL">Semua Kelompok (44 Kelompok)</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Scope Status Pill -->
+          <div class="flex flex-col justify-end">
+            <div class="rounded-xl bg-teal-50/80 border border-teal-200/80 px-3.5 py-2.5 flex items-center gap-2.5">
+              <span class="flex h-2.5 w-2.5 shrink-0 rounded-full bg-[#0F766E]"></span>
+              <div class="min-w-0">
+                <p class="text-[11px] font-semibold uppercase tracking-wider text-teal-800">Cakupan Tampilan Aktif</p>
+                <p id="activeFilterLabel" class="text-xs sm:text-sm font-bold text-slate-800 truncate">
+                  Seluruh Daerah (8 Desa • 44 Kelompok)
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Reset Filter Button -->
+        <div class="flex items-center justify-end">
+          <button
+            id="btnResetFilter"
+            type="button"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-semibold text-sm transition active:scale-[0.99] cursor-pointer w-full sm:w-auto"
+          >
+            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span>Reset Filter</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 Executive KPI Scorecards -->
+    <section aria-label="Ringkasan Indikator Utama" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5">
+      <!-- KPI 1: Muda-Mudi Terdata Detail & % Cakupan -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 flex flex-col justify-between relative overflow-hidden print-break-inside-avoid">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-[#0F766E]"></div>
+        <div>
+          <div class="flex items-start justify-between gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Muda-Mudi Terdata Detail</span>
+            <span class="p-2 rounded-xl bg-teal-50 text-[#0F766E]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </span>
+          </div>
+          <div class="mt-3 flex items-baseline gap-2.5">
+            <h2 id="kpiTerdata" class="text-3xl font-extrabold text-slate-900 tracking-tight">896</h2>
+            <span class="text-sm font-medium text-slate-500">Jiwa</span>
+            <span id="kpiCakupanBadge" class="ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-teal-100 text-teal-800">
+              79,9% Cakupan
+            </span>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 space-y-1">
+          <div class="flex items-center justify-between text-xs text-slate-600">
+            <span>Potensi MM Induk (≥15 th):</span>
+            <span id="kpiPotensiInduk" class="font-bold text-slate-800">1.122 Jiwa</span>
+          </div>
+          <p id="kpiGenderSub" class="text-[11px] text-slate-500">
+            Laki-laki: 399 (44,5%) • Perempuan: 497 (55,5%)
+          </p>
+        </div>
+      </div>
+
+      <!-- KPI 2: Aktif Bekerja / Usaha / MT -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 flex flex-col justify-between relative overflow-hidden print-break-inside-avoid">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-emerald-600"></div>
+        <div>
+          <div class="flex items-start justify-between gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Aktif Bekerja / Usaha / MT</span>
+            <span class="p-2 rounded-xl bg-emerald-50 text-emerald-700">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+            </span>
+          </div>
+          <div class="mt-3 flex items-baseline gap-2.5">
+            <h2 id="kpiKerja" class="text-3xl font-extrabold text-slate-900 tracking-tight">423</h2>
+            <span class="text-sm font-medium text-slate-500">Jiwa</span>
+            <span id="kpiKerjaPct" class="ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+              47,2%
+            </span>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 space-y-1">
+          <div class="flex items-center justify-between text-xs text-slate-600">
+            <span>Kerja/Usaha/MT Murni:</span>
+            <span id="kpiKerjaMurni" class="font-bold text-slate-800">373 Jiwa (41,6%)</span>
+          </div>
+          <p id="kpiKerjaSub" class="text-[11px] text-slate-500">
+            Termasuk 50 jiwa (5,6%) kuliah sambil kerja/MT
+          </p>
+        </div>
+      </div>
+
+      <!-- KPI 3: Aktif Kuliah & Sekolah -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 flex flex-col justify-between relative overflow-hidden print-break-inside-avoid">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-[#2563EB]"></div>
+        <div>
+          <div class="flex items-start justify-between gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Aktif Kuliah &amp; Sekolah</span>
+            <span class="p-2 rounded-xl bg-blue-50 text-[#2563EB]">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M12 14l9-5-9-5-9 5 9 5z" />
+                <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" />
+              </svg>
+            </span>
+          </div>
+          <div class="mt-3 flex items-baseline gap-2.5">
+            <h2 id="kpiPendidikan" class="text-3xl font-extrabold text-slate-900 tracking-tight">362</h2>
+            <span class="text-sm font-medium text-slate-500">Jiwa</span>
+            <span id="kpiPendidikanPct" class="ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-[#2563EB]">
+              40,4%
+            </span>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 space-y-1">
+          <div class="flex items-center justify-between text-xs text-slate-600">
+            <span>Kuliah Murni / SMA-SMK:</span>
+            <span id="kpiPendidikanDetail" class="font-bold text-slate-800">196 Kuliah • 166 SMA</span>
+          </div>
+          <p id="kpiPendidikanSub" class="text-[11px] text-slate-500">
+            Total mahasiswa aktif: 246 jiwa (termasuk +50 kerja)
+          </p>
+        </div>
+      </div>
+
+      <!-- KPI 4: Sedang Mencari Kerja & Siap Menikah 8-10 -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 flex flex-col justify-between relative overflow-hidden print-break-inside-avoid">
+        <div class="absolute top-0 left-0 w-1.5 h-full bg-gradient-to-b from-[#D97706] to-[#E11D48]"></div>
+        <div class="space-y-3">
+          <!-- Top Metric: Mencari Kerja (Amber) -->
+          <div class="flex items-center justify-between gap-2 bg-amber-50/80 border border-amber-200/70 rounded-xl px-3 py-2">
+            <div>
+              <p class="text-[11px] font-bold uppercase tracking-wider text-amber-800">Sedang Mencari Kerja</p>
+              <div class="flex items-baseline gap-1.5 mt-0.5">
+                <span id="kpiMencariKerja" class="text-xl font-extrabold text-[#D97706]">86</span>
+                <span class="text-xs font-medium text-amber-900/80">Jiwa</span>
+              </div>
+            </div>
+            <span id="kpiMencariKerjaPct" class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-100 text-[#D97706]">
+              9,6%
+            </span>
+          </div>
+
+          <!-- Bottom Metric: Siap Menikah Tinggi (Rose) -->
+          <div class="flex items-center justify-between gap-2 bg-rose-50/80 border border-rose-200/70 rounded-xl px-3 py-2">
+            <div>
+              <p class="text-[11px] font-bold uppercase tracking-wider text-rose-800">Siap Menikah (Skor 8–10)</p>
+              <div class="flex items-baseline gap-1.5 mt-0.5">
+                <span id="kpiSiapNikah" class="text-xl font-extrabold text-[#E11D48]">128</span>
+                <span class="text-xs font-medium text-rose-900/80">Jiwa</span>
+              </div>
+            </div>
+            <span id="kpiSiapNikahPct" class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-100 text-[#E11D48]">
+              17,6% Pra-Nikah
+            </span>
+          </div>
+        </div>
+        <p id="kpiPrioritasSub" class="mt-2.5 text-[11px] text-slate-500">
+          Skor rata-rata kesiapan menikah: 4,30/10 • Tidak bekerja: 24 (2,7%)
+        </p>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <nav aria-label="Navigasi Analisis Dashboard" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-1.5 no-print">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-1.5" role="tablist">
+        <button
+          id="tabBtn1"
+          type="button"
+          role="tab"
+          aria-selected="true"
+          aria-controls="tabPanel1"
+          data-tab="1"
+          class="tab-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all cursor-pointer bg-[#0F766E] text-white shadow-sm"
+        >
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          <span>1. Sebaran Wilayah &amp; Aktivitas</span>
+        </button>
+
+        <button
+          id="tabBtn2"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="tabPanel2"
+          data-tab="2"
+          class="tab-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+        >
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+          <span>2. Pendidikan, Minat &amp; Potensi Skill</span>
+        </button>
+
+        <button
+          id="tabBtn3"
+          type="button"
+          role="tab"
+          aria-selected="false"
+          aria-controls="tabPanel3"
+          data-tab="3"
+          class="tab-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+        >
+          <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+          </svg>
+          <span>3. Tabel Evaluasi 44 Kelompok</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 1: SEBARAN WILAYAH & AKTIVITAS                                    -->
+    <!-- ===================================================================== -->
+    <div id="tabPanel1" role="tabpanel" class="space-y-6">
+      <!-- Row 1: Wilayah Comparison + Komposisi Aktivitas -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Chart 1A: Potensi MM Induk vs Terdata Detail per Desa -->
+        <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 print-break-inside-avoid">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <h3 id="chartWilayahTitle" class="text-base sm:text-lg font-bold text-slate-900">
+                Potensi MM Induk vs Terdata Detail per Desa
+              </h3>
+              <p id="chartWilayahSubtitle" class="text-xs sm:text-sm text-slate-500">
+                Perbandingan target potensi usia ≥15 tahun dengan realisasi survei detail (8 Desa)
+              </p>
+            </div>
+            <span class="inline-flex items-center self-start sm:self-center px-2.5 py-1 rounded-lg bg-teal-50 text-[#0F766E] text-xs font-semibold">
+              Cakupan Total: 79,9%
+            </span>
+          </div>
+          <div class="relative w-full h-72 sm:h-80">
+            <canvas id="chartWilayah"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 1B: Donut Chart Komposisi Aktivitas Saat Ini -->
+        <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 print-break-inside-avoid">
+          <div class="flex items-start justify-between gap-2 mb-4">
+            <div>
+              <h3 class="text-base sm:text-lg font-bold text-slate-900">
+                Komposisi Aktivitas Saat Ini
+              </h3>
+              <p id="chartAktivitasSubtitle" class="text-xs sm:text-sm text-slate-500">
+                Distribusi kesibukan utama 896 responden muda-mudi
+              </p>
+            </div>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 text-xs font-semibold">
+              Survei Detail
+            </span>
+          </div>
+          <div class="relative w-full h-60 sm:h-64">
+            <canvas id="chartAktivitas"></canvas>
+          </div>
+          <!-- Compact Custom Legend -->
+          <div id="aktivitasLegend" class="mt-4 grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs border-t border-slate-100 pt-3"></div>
+        </div>
+      </div>
+
+      <!-- Row 2: Distribusi Kesiapan Menikah + Piramida Regenerasi Generus -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Chart 1C: Distribusi Kesiapan Menikah Skor 1-10 -->
+        <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 print-break-inside-avoid">
+          <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-4">
+            <div>
+              <h3 class="text-base sm:text-lg font-bold text-slate-900">
+                Distribusi Kesiapan Menikah (Skala 1–10)
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-500">
+                729 Responden Usia Pra-Nikah • Rata-rata Skor: <strong class="text-slate-800">4,30 / 10</strong>
+              </p>
+            </div>
+            <span class="inline-flex items-center self-start px-2.5 py-1 rounded-lg bg-rose-50 text-[#E11D48] border border-rose-200/70 text-xs font-bold">
+              Skor 8–10: 128 Jiwa (17,6%)
+            </span>
+          </div>
+          <div class="relative w-full h-64 sm:h-72">
+            <canvas id="chartKesiapanNikah"></canvas>
+          </div>
+          <div class="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600">
+            <div class="flex items-center gap-4">
+              <span class="inline-flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-sm bg-slate-300"></span> Tahap Persiapan (1–4): 369
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-sm bg-[#0F766E]"></span> Menengah (5–7): 232
+              </span>
+              <span class="inline-flex items-center gap-1.5">
+                <span class="w-3 h-3 rounded-sm bg-[#E11D48]"></span> Siap Tinggi (8–10): 128
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart 1D: Horizontal Bar Chart Piramida Regenerasi Generus Induk 2.310 Jiwa -->
+        <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 print-break-inside-avoid">
+          <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-4">
+            <div>
+              <h3 class="text-base sm:text-lg font-bold text-slate-900">
+                Piramida Regenerasi Generus Database Induk
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-500">
+                Struktur jenjang pembinaan total <strong class="text-slate-800">2.310 jiwa</strong> Daerah Bogor Selatan 1
+              </p>
+            </div>
+            <span class="inline-flex items-center self-start px-2.5 py-1 rounded-lg bg-blue-50 text-[#2563EB] text-xs font-bold">
+              Potensi MM ≥15th: 1.122 (48,6%)
+            </span>
+          </div>
+          <div class="relative w-full h-64 sm:h-72">
+            <canvas id="chartPiramida"></canvas>
+          </div>
+          <div class="mt-3 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+            <span>Komposisi Survei Detail (896 jiwa): <strong class="text-slate-700">Pra Nikah 729 (81,4%)</strong> • <strong class="text-slate-700">Remaja SMA/SMK 166 (18,5%)</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 2: PENDIDIKAN, MINAT & POTENSI SKILL                              -->
+    <!-- ===================================================================== -->
+    <div id="tabPanel2" role="tabpanel" class="hidden space-y-6">
+      <!-- Context Banner for Tab 2 -->
+      <div class="bg-gradient-to-r from-blue-50 via-teal-50/60 to-slate-50 border border-blue-200/70 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-start gap-3">
+          <div class="p-2.5 rounded-xl bg-[#2563EB] text-white shrink-0 mt-0.5">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="text-sm font-bold text-slate-900">Profil Akademik, Minat &amp; Talenta Muda-Mudi (Tingkat Daerah)</h4>
+            <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
+              Total mahasiswa aktif terdata sebanyak <strong>246 jiwa</strong> (196 kuliah murni + 50 kuliah sambil bekerja/MT). Pemetaan hobi &amp; potensi keahlian bersumber dari Database Induk Muda-Mudi Bogor Selatan 1.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 1: Top 10 Perguruan Tinggi + Jenjang Studi -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Chart 2A: Top 10 Perguruan Tinggi -->
+        <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 print-break-inside-avoid">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <h3 class="text-base sm:text-lg font-bold text-slate-900">
+                Top 10 Perguruan Tinggi Mahasiswa Muda-Mudi
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-500">
+                Sebaran kampus utama dari total 246 mahasiswa aktif (Top 10 = 188 mahasiswa)
+              </p>
+            </div>
+            <span class="inline-flex items-center self-start px-2.5 py-1 rounded-lg bg-blue-50 text-[#2563EB] text-xs font-bold">
+              Klaster IPB &amp; AKA: 47,6%
+            </span>
+          </div>
+          <div class="relative w-full h-80 sm:h-96">
+            <canvas id="chartKampus"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2B: Jenjang Studi Mahasiswa -->
+        <div class="lg:col-span-5 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 flex flex-col justify-between print-break-inside-avoid">
+          <div>
+            <div class="flex items-start justify-between gap-2 mb-4">
+              <div>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900">
+                  Jenjang Studi Mahasiswa
+                </h3>
+                <p class="text-xs sm:text-sm text-slate-500">
+                  Komposisi tingkat pendidikan tinggi (246 mahasiswa)
+                </p>
+              </div>
+              <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-[#2563EB] text-xs font-bold">
+                Dominan S1 (67,5%)
+              </span>
+            </div>
+            <div class="relative w-full h-64">
+              <canvas id="chartJenjang"></canvas>
+            </div>
+          </div>
+
+          <!-- Jenjang Breakdown Pills -->
+          <div class="mt-4 pt-3 border-t border-slate-100 grid grid-cols-3 gap-2 text-center">
+            <div class="rounded-xl bg-slate-50 p-2 border border-slate-100">
+              <p class="text-[11px] font-semibold text-slate-500">Sarjana (S1)</p>
+              <p class="text-base font-extrabold text-[#2563EB]">166 <span class="text-[11px] font-medium text-slate-500">(67,5%)</span></p>
+            </div>
+            <div class="rounded-xl bg-slate-50 p-2 border border-slate-100">
+              <p class="text-[11px] font-semibold text-slate-500">Vokasi (D4 &amp; D3)</p>
+              <p class="text-base font-extrabold text-[#0F766E]">68 <span class="text-[11px] font-medium text-slate-500">(27,6%)</span></p>
+            </div>
+            <div class="rounded-xl bg-slate-50 p-2 border border-slate-100">
+              <p class="text-[11px] font-semibold text-slate-500">S2 / Profesi / S3</p>
+              <p class="text-base font-extrabold text-slate-800">10 <span class="text-[11px] font-medium text-slate-500">(4,1%)</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: Kategori Hobi + Kategori Skill / Cita-Cita -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Chart 2C: Pemetaan Kategori Hobi -->
+        <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 print-break-inside-avoid">
+          <div class="flex items-start justify-between gap-2 mb-4">
+            <div>
+              <h3 class="text-base sm:text-lg font-bold text-slate-900">
+                Pemetaan Kategori Hobi (Database Induk MM)
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-500">
+                Minat aktivitas positif untuk pembinaan kebersamaan muda-mudi
+              </p>
+            </div>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-teal-50 text-[#0F766E] text-xs font-bold">
+              855 Peminatan
+            </span>
+          </div>
+          <div class="relative w-full h-64">
+            <canvas id="chartHobi"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2D: Pemetaan Kategori Skill / Cita-Cita -->
+        <div class="lg:col-span-6 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-5 sm:p-6 print-break-inside-avoid">
+          <div class="flex items-start justify-between gap-2 mb-4">
+            <div>
+              <h3 class="text-base sm:text-lg font-bold text-slate-900">
+                Pemetaan Kategori Skill &amp; Cita-Cita
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-500">
+                Potensi kompetensi profesional &amp; kemandirian ekonomi muda-mudi
+              </p>
+            </div>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-blue-50 text-[#2563EB] text-xs font-bold">
+              Digital/IT: 73,3%
+            </span>
+          </div>
+          <div class="relative w-full h-64">
+            <canvas id="chartSkill"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Strategic Executive Takeaways -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+          <span class="inline-block px-2.5 py-1 rounded-md bg-blue-50 text-[#2563EB] text-xs font-bold mb-2">1. Basis Kampus Strategis</span>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            <strong>IPB University (81)</strong> dan <strong>Politeknik AKA Bogor (36)</strong> menyerap hampir separuh total mahasiswa daerah, menjadikan pembinaan berbasis kampus di sekitar Dramaga, Gunung Gede, dan Margajaya sangat vital.
+          </p>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+          <span class="inline-block px-2.5 py-1 rounded-md bg-teal-50 text-[#0F766E] text-xs font-bold mb-2">2. Akselerasi Talenta Digital</span>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Keahlian <strong>Digital / IT / Desain (198 jiwa)</strong> serta <strong>Wirausaha / Bisnis (34 jiwa)</strong> merupakan modal kuat untuk program inkubasi karier bagi 86 pencari kerja.
+          </p>
+        </div>
+        <div class="bg-white rounded-2xl border border-slate-200/80 p-4 shadow-sm">
+          <span class="inline-block px-2.5 py-1 rounded-md bg-amber-50 text-[#D97706] text-xs font-bold mb-2">3. Kanal Pembinaan Minat</span>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Tingginya minat <strong>Olahraga (362)</strong> dan <strong>Edukasi / Literasi (234)</strong> dapat dijadikan pintu masuk utama meningkatkan partisipasi kelompok dengan cakupan survei di bawah 60%.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 3: TABEL EVALUASI 44 KELOMPOK                                     -->
+    <!-- ===================================================================== -->
+    <div id="tabPanel3" role="tabpanel" class="hidden space-y-5">
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <!-- Table Toolbar -->
+        <div class="p-4 sm:p-6 border-b border-slate-200/80 space-y-4">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div>
+              <h3 class="text-base sm:text-lg font-bold text-slate-900">
+                Tabel Evaluasi Pendataan &amp; Kondisi 44 Kelompok
+              </h3>
+              <p class="text-xs sm:text-sm text-slate-500">
+                Klik header kolom untuk mengurutkan data • Indikator warna menunjukkan tingkat cakupan pendataan survei detail terhadap potensi induk
+              </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2.5 no-print">
+              <button
+                id="btnExportTableCSV"
+                type="button"
+                class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#0F766E] hover:bg-[#115E59] text-white text-xs sm:text-sm font-semibold shadow-sm transition cursor-pointer"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span>Export CSV Tabel Ini</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Search & Quick Filter Badges -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 no-print">
+            <!-- Search Input -->
+            <div class="relative flex-1 max-w-md">
+              <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                id="tableSearchInput"
+                type="text"
+                placeholder="Cari nama kelompok atau desa..."
+                class="w-full rounded-xl border border-slate-300 bg-slate-50/70 focus:bg-white pl-10 pr-4 py-2 text-sm text-slate-800 placeholder:text-slate-400 focus:border-[#0F766E] focus:outline-none focus:ring-2 focus:ring-teal-600/20 transition"
+              />
+            </div>
+
+            <!-- Status Filter Pills -->
+            <div class="flex flex-wrap items-center gap-1.5" id="statusFilterGroup">
+              <button type="button" data-status="ALL" class="status-chip px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-white cursor-pointer transition">
+                Semua (44)
+              </button>
+              <button type="button" data-status="HIGH" class="status-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 cursor-pointer transition">
+                Cakupan ≥80%
+              </button>
+              <button type="button" data-status="MED" class="status-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 cursor-pointer transition">
+                Cakupan 60–79%
+              </button>
+              <button type="button" data-status="LOW" class="status-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100 cursor-pointer transition">
+                Perlu Atensi &lt;60%
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Responsive Table Wrapper -->
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50/90 text-slate-600 text-xs font-bold uppercase tracking-wider">
+              <tr>
+                <th scope="col" class="px-4 py-3.5 text-left">No</th>
+                <th scope="col" data-sort="desa" class="sortable-th px-4 py-3.5 text-left cursor-pointer hover:text-[#0F766E] select-none">
+                  Desa <span class="sort-icon text-slate-400">↕</span>
+                </th>
+                <th scope="col" data-sort="kelompok" class="sortable-th px-4 py-3.5 text-left cursor-pointer hover:text-[#0F766E] select-none">
+                  Kelompok <span class="sort-icon text-slate-400">↕</span>
+                </th>
+                <th scope="col" data-sort="totalGenerus" class="sortable-th px-3 py-3.5 text-right cursor-pointer hover:text-[#0F766E] select-none">
+                  Total Generus <span class="sort-icon text-slate-400">↕</span>
+                </th>
+                <th scope="col" data-sort="potensiMM" class="sortable-th px-3 py-3.5 text-right cursor-pointer hover:text-[#0F766E] select-none">
+                  Potensi MM Induk <span class="sort-icon text-slate-400">↕</span>
+                </th>
+                <th scope="col" data-sort="terdataDetail" class="sortable-th px-3 py-3.5 text-right cursor-pointer hover:text-[#0F766E] select-none">
+                  Terdata Detail <span class="sort-icon text-slate-400">↕</span>
+                </th>
+                <th scope="col" data-sort="cakupanPct" class="sortable-th px-4 py-3.5 text-center cursor-pointer hover:text-[#0F766E] select-none">
+                  % Cakupan <span class="sort-icon text-slate-400">↕</span>
+                </th>
+                <th scope="col" data-sort="kerja" class="sortable-th px-3 py-3.5 text-right cursor-pointer hover:text-[#0F766E] select-none">
+                  Kerja/Usaha/MT <span class="sort-icon text-slate-400">↕</span>
+                </th>
+                <th scope="col" data-sort="kuliahSekolah" class="sortable-th px-3 py-3.5 text-right cursor-pointer hover:text-[#0F766E] select-none">
+                  Kuliah/Sekolah <span class="sort-icon text-slate-400">↕</span>
+                </th>
+                <th scope="col" data-sort="mencariKerja" class="sortable-th px-3 py-3.5 text-right cursor-pointer hover:text-[#0F766E] select-none">
+                  Mencari Kerja <span class="sort-icon text-slate-400">↕</span>
+                </th>
+                <th scope="col" data-sort="siapNikah" class="sortable-th px-4 py-3.5 text-right cursor-pointer hover:text-[#0F766E] select-none">
+                  Siap Nikah (8–10) <span class="sort-icon text-slate-400">↕</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="kelompokTableBody" class="divide-y divide-slate-100 bg-white">
+              <!-- Rendered dynamically by JS -->
+            </tbody>
+            <tfoot id="kelompokTableFoot" class="bg-teal-50/70 font-bold text-slate-900 border-t-2 border-teal-200">
+              <!-- Summary footer rendered dynamically -->
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Legend Footer -->
+        <div class="px-4 sm:px-6 py-3.5 bg-slate-50 border-t border-slate-200/80 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
+          <div class="flex flex-wrap items-center gap-3">
+            <span class="font-semibold text-slate-700">Keterangan Badge Cakupan:</span>
+            <span class="inline-flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Hijau (≥80% Optimal)
+            </span>
+            <span class="inline-flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Kuning (60%–79,9% Cukup)
+            </span>
+            <span class="inline-flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Merah (&lt;60% Perlu Percepatan)
+            </span>
+          </div>
+          <p class="text-slate-500">
+            *Cakupan &gt;100% menandakan responden survei detail mencakup pendatang/mahasiswa kos aktif di kelompok tersebut.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Executive Footer -->
+  <footer class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 mt-4 border-t border-slate-200/80 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2">
+    <p>Sumber Data: <strong>Database Generus 2026 &amp; Survei Detail Muda-Mudi Daerah Bogor Selatan 1</strong></p>
+    <p>Disusun untuk Laporan Evaluasi &amp; Pemetaan Tingkat Pusat • 2026</p>
+  </footer>
+
+  <!-- ======================================================================= -->
+  <!-- JAVASCRIPT APPLICATION LOGIC & DATASET                                  -->
+  <!-- ======================================================================= -->
+  <script>
+    (function () {
+      'use strict';
+
+      // -----------------------------------------------------------------------
+      // 1. MASTER DATASET (DATABASE GENERUS 2026 - BOGOR SELATAN 1)
+      // -----------------------------------------------------------------------
+      const RAW_KELOMPOK_DATA = [
+        ['BUDI AGUNG','Budi Agung 1',100,39,40,18,17,4,6],
+        ['BUDI AGUNG','Budi Agung 2',45,22,21,12,8,1,5],
+        ['BUDI AGUNG','Cilebut 1',81,45,38,16,19,0,3],
+        ['BUDI AGUNG','Cilebut 2',84,30,15,4,10,1,3],
+        ['BUDI AGUNG','Cimanggu',44,24,14,12,2,0,6],
+        ['BUDI AGUNG','Kebon Pedes',33,23,22,7,7,6,1],
+        ['CIPARIGI','Ciparigi 1',32,22,17,14,2,1,2],
+        ['CIPARIGI','Ciparigi 2',70,35,26,15,7,2,4],
+        ['CIPARIGI','Warung Jambu',69,39,24,10,12,1,6],
+        ['CIPAYUNG','Al Badar',47,20,19,7,9,3,1],
+        ['CIPAYUNG','Al Ubaidah',42,24,18,14,3,1,1],
+        ['CIPAYUNG','Ciawi 1',40,20,16,10,3,2,3],
+        ['CIPAYUNG','Ciawi 2',65,32,28,13,10,4,1],
+        ['CIPAYUNG','Tapos',36,19,14,5,6,3,2],
+        ['GUNUNG GEDE','Ciapus',29,13,11,2,7,1,0],
+        ['GUNUNG GEDE','Cikaret',49,23,16,4,9,3,3],
+        ['GUNUNG GEDE','Green Arofah',72,38,31,16,12,3,3],
+        ['GUNUNG GEDE','Gunung Gede',64,31,39,20,16,3,8],
+        ['GUNUNG GEDE','PPPM BIGG',33,27,36,4,31,1,0],
+        ['GUNUNG GEDE','Pakuan',59,35,19,11,5,3,3],
+        ['GUNUNG GEDE','Pondok Rumput',21,14,9,3,3,3,0],
+        ['GUNUNG GEDE','Tajur',25,5,9,9,0,0,2],
+        ['GUNUNG SINDUR','CIP 1',72,27,26,22,2,0,4],
+        ['GUNUNG SINDUR','CIP 2',67,30,13,4,3,3,3],
+        ['GUNUNG SINDUR','GIS',32,15,14,10,4,0,6],
+        ['GUNUNG SINDUR','Mutiara',56,25,19,17,1,1,2],
+        ['MARGAJAYA','Cibanteng',77,46,30,8,19,3,4],
+        ['MARGAJAYA','Cibungbulang',71,24,10,4,3,1,2],
+        ['MARGAJAYA','Ciherang',33,19,13,6,7,0,3],
+        ['MARGAJAYA','Ciomas',50,22,23,16,3,2,7],
+        ['MARGAJAYA','Dewi Sartika',61,27,18,10,8,0,3],
+        ['MARGAJAYA','Margajaya 1',60,32,21,9,7,3,0],
+        ['MARGAJAYA','Margajaya 2',30,10,11,5,5,1,1],
+        ['MARGAJAYA','PPM BI',45,44,32,4,28,0,2],
+        ['SALABENDA','Parakan Jaya',28,15,7,2,4,0,2],
+        ['SALABENDA','Permata Sari',37,8,4,2,2,0,0],
+        ['SALABENDA','Pura Bojong',38,7,2,1,1,0,0],
+        ['SALABENDA','Salabenda',94,43,30,17,12,0,3],
+        ['SALABENDA','Yasmin',47,22,20,6,10,4,0],
+        ['SAWANGAN','BSI',31,15,13,6,3,4,5],
+        ['SAWANGAN','Ciseeng',58,28,24,9,10,5,5],
+        ['SAWANGAN','Inkopad',58,34,35,12,15,8,3],
+        ['SAWANGAN','Muara Barokah',41,22,20,11,5,4,4],
+        ['SAWANGAN','Sawangan',84,27,29,16,12,1,6]
+      ];
+
+      // Structured dataset with computed coverage percentage
+      const KELOMPOK_DATA = RAW_KELOMPOK_DATA.map((row, idx) => {
+        const [desa, kelompok, totalGenerus, potensiMM, terdataDetail, kerja, kuliahSekolah, mencariKerja, siapNikah] = row;
+        const cakupanPct = potensiMM > 0 ? (terdataDetail / potensiMM) * 100 : 0;
+        return {
+          id: idx + 1,
+          desa,
+          kelompok,
+          totalGenerus,
+          potensiMM,
+          terdataDetail,
+          cakupanPct,
+          kerja,
+          kuliahSekolah,
+          mencariKerja,
+          siapNikah
+        };
+      });
+
+      // Regional Aggregated Constants (Exact numbers from Database Generus 2026)
+      const REGIONAL_STATS = {
+        totalGenerusInduk: 2310,
+        generusTiers: [
+          { label: 'Pra Nikah (≥ 18 th)', count: 884, color: '#0F766E' },
+          { label: 'Caberawit (< 12 th)', count: 821, color: '#14B8A6' },
+          { label: 'Pra Remaja (12–14 th)', count: 282, color: '#38BDF8' },
+          { label: 'Remaja (15–17 th)', count: 238, color: '#2563EB' },
+          { label: 'Belum Tercatat TTL', count: 85, color: '#94A3B8' }
+        ],
+        potensiMMInduk: 1122,
+        terdataDetail: 896,
+        praNikahSurvei: 729,
+        remajaSurvei: 166,
+        gender: { laki: 399, perempuan: 497 },
+        aktivitas: [
+          { label: 'Kerja / Usaha / MT (Murni)', count: 373, pct: '41,6%', color: '#0F766E' },
+          { label: 'Kuliah Murni', count: 196, pct: '21,9%', color: '#2563EB' },
+          { label: 'Sekolah SMA / SMK', count: 166, pct: '18,5%', color: '#38BDF8' },
+          { label: 'Sedang Mencari Kerja', count: 86, pct: '9,6%', color: '#D97706' },
+          { label: 'Kuliah sambil Kerja / MT', count: 50, pct: '5,6%', color: '#7C3AED' },
+          { label: 'Tidak Bekerja / Lainnya', count: 24, pct: '2,7%', color: '#94A3B8' }
+        ],
+        kesiapanMenikah: {
+          rataRata: '4,30',
+          totalResponden: 729,
+          scores: [219, 40, 64, 46, 123, 40, 69, 67, 24, 37],
+          siapTinggiTotal: 128,
+          siapTinggiPct: '17,6%'
+        },
+        kampusTop10: [
+          { name: 'IPB University', count: 81 },
+          { name: 'Politeknik AKA Bogor', count: 36 },
+          { name: 'Universitas Terbuka', count: 18 },
+          { name: 'Universitas Pakuan', count: 16 },
+          { name: 'Universitas Djuanda', count: 10 },
+          { name: 'Univ. Ibn Khaldun Bogor', count: 8 },
+          { name: 'Universitas Pamulang', count: 7 },
+          { name: 'Universitas Indonesia', count: 4 },
+          { name: 'Universitas Gunadarma', count: 4 },
+          { name: 'Telkom University', count: 4 }
+        ],
+        jenjangStudi: [
+          { label: 'S1 (Sarjana)', count: 166, color: '#2563EB' },
+          { label: 'D4 (Sarjana Terapan)', count: 44, color: '#0F766E' },
+          { label: 'D3 (Diploma)', count: 24, color: '#14B8A6' },
+          { label: 'S2 (Magister)', count: 5, color: '#D97706' },
+          { label: 'Profesi', count: 4, color: '#7C3AED' },
+          { label: 'S3 (Doktor)', count: 1, color: '#E11D48' }
+        ],
+        hobi: [
+          { label: 'Olahraga', count: 362, color: '#0F766E' },
+          { label: 'Edukasi / Literasi', count: 234, color: '#2563EB' },
+          { label: 'Lifestyle / Travel', count: 154, color: '#0D9488' },
+          { label: 'Seni & Kreatif', count: 105, color: '#D97706' }
+        ],
+        skill: [
+          { label: 'Digital / IT / Desain', count: 198, color: '#2563EB' },
+          { label: 'Wirausaha / Bisnis', count: 34, color: '#0F766E' },
+          { label: 'Kesehatan', count: 23, color: '#10B981' },
+          { label: 'Pendidikan', count: 9, color: '#D97706' },
+          { label: 'Keamanan', count: 6, color: '#64748B' }
+        ]
+      };
+
+      // -----------------------------------------------------------------------
+      // 2. APPLICATION STATE
+      // -----------------------------------------------------------------------
+      const state = {
+        selectedDesa: 'ALL',
+        selectedKelompok: 'ALL',
+        activeTab: '1',
+        tableSearch: '',
+        tableStatusFilter: 'ALL',
+        sortKey: 'desa',
+        sortAsc: true
+      };
+
+      // Chart instances registry
+      const charts = {
+        wilayah: null,
+        aktivitas: null,
+        kesiapanNikah: null,
+        piramida: null,
+        kampus: null,
+        jenjang: null,
+        hobi: null,
+        skill: null
+      };
+
+      // -----------------------------------------------------------------------
+      // 3. HELPER FORMATTING & UI UTILITIES
+      // -----------------------------------------------------------------------
+      function formatNumber(num) {
+        return new Intl.NumberFormat('id-ID').format(Math.round(num));
+      }
+
+      function formatPercent(val, decimals = 1) {
+        return val.toFixed(decimals).replace('.', ',') + '%';
+      }
+
+      function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        const bgClass = type === 'success'
+          ? 'bg-slate-900 text-white border-teal-500'
+          : 'bg-amber-900 text-white border-amber-400';
+
+        toast.className = `pointer-events-auto flex items-center gap-2.5 px-4 py-3 rounded-xl shadow-lg border-l-4 text-xs sm:text-sm font-medium transition-all duration-300 transform translate-y-2 opacity-0 ${bgClass}`;
+        toast.innerHTML = `
+          <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+          </svg>
+          <span>${message}</span>
+        `;
+
+        container.appendChild(toast);
+        requestAnimationFrame(() => {
+          toast.classList.remove('translate-y-2', 'opacity-0');
+        });
+
+        setTimeout(() => {
+          toast.classList.add('opacity-0', 'translate-y-2');
+          setTimeout(() => toast.remove(), 300);
+        }, 3200);
+      }
+
+      function getFilteredKelompoks() {
+        return KELOMPOK_DATA.filter((item) => {
+          const matchDesa = state.selectedDesa === 'ALL' || item.desa === state.selectedDesa;
+          const matchKelompok = state.selectedKelompok === 'ALL' || item.kelompok === state.selectedKelompok;
+          return matchDesa && matchKelompok;
+        });
+      }
+
+      // -----------------------------------------------------------------------
+      // 4. FILTER DROPDOWN POPULATION & EVENTS
+      // -----------------------------------------------------------------------
+      function populateDesaFilter() {
+        const selectDesa = document.getElementById('filterDesa');
+        const uniqueDesas = [...new Set(KELOMPOK_DATA.map((d) => d.desa))].sort();
+        selectDesa.innerHTML = `<option value="ALL">Semua Desa (${uniqueDesas.length} Desa)</option>`;
+        uniqueDesas.forEach((desa) => {
+          const count = KELOMPOK_DATA.filter((d) => d.desa === desa).length;
+          const opt = document.createElement('option');
+          opt.value = desa;
+          opt.textContent = `${desa} (${count} Kelompok)`;
+          selectDesa.appendChild(opt);
+        });
+      }
+
+      function populateKelompokFilter() {
+        const selectKelompok = document.getElementById('filterKelompok');
+        const list = state.selectedDesa === 'ALL'
+          ? KELOMPOK_DATA
+          : KELOMPOK_DATA.filter((d) => d.desa === state.selectedDesa);
+
+        selectKelompok.innerHTML = `<option value="ALL">Semua Kelompok (${list.length} Kelompok)</option>`;
+        list.forEach((item) => {
+          const opt = document.createElement('option');
+          opt.value = item.kelompok;
+          opt.textContent = state.selectedDesa === 'ALL'
+            ? `${item.kelompok} — ${item.desa}`
+            : item.kelompok;
+          selectKelompok.appendChild(opt);
+        });
+
+        if (state.selectedKelompok !== 'ALL' && !list.some((d) => d.kelompok === state.selectedKelompok)) {
+          state.selectedKelompok = 'ALL';
+        }
+        selectKelompok.value = state.selectedKelompok;
+      }
+
+      // -----------------------------------------------------------------------
+      // 5. UPDATE KPI SCORECARDS DYNAMICALLY
+      // -----------------------------------------------------------------------
+      function updateKPIs(filteredRows) {
+        const isAll = state.selectedDesa === 'ALL' && state.selectedKelompok === 'ALL';
+
+        const sumGenerus = filteredRows.reduce((acc, r) => acc + r.totalGenerus, 0);
+        const sumPotensi = filteredRows.reduce((acc, r) => acc + r.potensiMM, 0);
+        const sumTerdata = filteredRows.reduce((acc, r) => acc + r.terdataDetail, 0);
+        const sumKerja = filteredRows.reduce((acc, r) => acc + r.kerja, 0);
+        const sumKuliahSekolah = filteredRows.reduce((acc, r) => acc + r.kuliahSekolah, 0);
+        const sumMencariKerja = filteredRows.reduce((acc, r) => acc + r.mencariKerja, 0);
+        const sumSiapNikah = filteredRows.reduce((acc, r) => acc + r.siapNikah, 0);
+
+        const cakupanPct = sumPotensi > 0 ? (sumTerdata / sumPotensi) * 100 : 0;
+        const kerjaPct = sumTerdata > 0 ? (sumKerja / sumTerdata) * 100 : 0;
+        const pendidikanPct = sumTerdata > 0 ? (sumKuliahSekolah / sumTerdata) * 100 : 0;
+        const mencariKerjaPct = sumTerdata > 0 ? (sumMencariKerja / sumTerdata) * 100 : 0;
+
+        // KPI 1
+        document.getElementById('kpiTerdata').textContent = formatNumber(sumTerdata);
+        document.getElementById('kpiPotensiInduk').textContent = `${formatNumber(sumPotensi)} Jiwa`;
+
+        const badgeEl = document.getElementById('kpiCakupanBadge');
+        badgeEl.textContent = `${formatPercent(cakupanPct)} Cakupan`;
+        if (cakupanPct >= 80) {
+          badgeEl.className = 'ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800';
+        } else if (cakupanPct >= 60) {
+          badgeEl.className = 'ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800';
+        } else {
+          badgeEl.className = 'ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800';
+        }
+
+        document.getElementById('kpiGenderSub').textContent = isAll
+          ? 'Laki-laki: 399 (44,5%) • Perempuan: 497 (55,5%)'
+          : `Total Generus Induk wilayah ini: ${formatNumber(sumGenerus)} jiwa`;
+
+        // KPI 2
+        document.getElementById('kpiKerja').textContent = formatNumber(sumKerja);
+        document.getElementById('kpiKerjaPct').textContent = formatPercent(kerjaPct);
+        if (isAll) {
+          document.getElementById('kpiKerjaMurni').textContent = '373 Jiwa (41,6%)';
+          document.getElementById('kpiKerjaSub').textContent = 'Termasuk 50 jiwa (5,6%) kuliah sambil kerja/MT';
+        } else {
+          document.getElementById('kpiKerjaMurni').textContent = `${formatNumber(sumKerja)} Jiwa Aktif`;
+          document.getElementById('kpiKerjaSub').textContent = 'Mencakup pekerja penuh waktu, wirausaha & MT';
+        }
+
+        // KPI 3
+        document.getElementById('kpiPendidikan').textContent = formatNumber(sumKuliahSekolah);
+        document.getElementById('kpiPendidikanPct').textContent = formatPercent(pendidikanPct);
+        if (isAll) {
+          document.getElementById('kpiPendidikanDetail').textContent = '196 Kuliah • 166 SMA';
+          document.getElementById('kpiPendidikanSub').textContent = 'Total mahasiswa aktif: 246 jiwa (termasuk +50 kerja)';
+        } else {
+          document.getElementById('kpiPendidikanDetail').textContent = `${formatNumber(sumKuliahSekolah)} Pelajar & Mahasiswa`;
+          document.getElementById('kpiPendidikanSub').textContent = 'Gabungan mahasiswa kuliah murni & siswa SMA/SMK';
+        }
+
+        // KPI 4
+        document.getElementById('kpiMencariKerja').textContent = formatNumber(sumMencariKerja);
+        document.getElementById('kpiMencariKerjaPct').textContent = formatPercent(mencariKerjaPct);
+        document.getElementById('kpiSiapNikah').textContent = formatNumber(sumSiapNikah);
+
+        if (isAll) {
+          document.getElementById('kpiSiapNikahPct').textContent = '17,6% Pra-Nikah';
+          document.getElementById('kpiPrioritasSub').textContent = 'Skor rata-rata kesiapan menikah: 4,30/10 • Tidak bekerja: 24 (2,7%)';
+        } else {
+          const siapPctFiltered = sumTerdata > 0 ? (sumSiapNikah / sumTerdata) * 100 : 0;
+          document.getElementById('kpiSiapNikahPct').textContent = `${formatPercent(siapPctFiltered)} Terdata`;
+          document.getElementById('kpiPrioritasSub').textContent = `Filter aktif: ${filteredRows.length} kelompok terpilih`;
+        }
+
+        // Update Active Filter Label
+        const labelEl = document.getElementById('activeFilterLabel');
+        if (isAll) {
+          labelEl.textContent = 'Seluruh Daerah (8 Desa • 44 Kelompok)';
+        } else if (state.selectedDesa !== 'ALL' && state.selectedKelompok === 'ALL') {
+          labelEl.textContent = `Desa ${state.selectedDesa} (${filteredRows.length} Kelompok)`;
+        } else {
+          const row = filteredRows[0];
+          labelEl.textContent = row ? `${row.kelompok} (Desa ${row.desa})` : state.selectedKelompok;
+        }
+      }
+
+      // -----------------------------------------------------------------------
+      // 6. INITIALIZE & UPDATE CHARTS (CHART.JS)
+      // -----------------------------------------------------------------------
+      Chart.defaults.font.family = "'Inter', system-ui, -apple-system, sans-serif";
+      Chart.defaults.color = '#475569';
+
+      function initCharts() {
+        // 1A. Chart Wilayah (Potensi MM Induk vs Terdata Detail)
+        const ctxWilayah = document.getElementById('chartWilayah').getContext('2d');
+        charts.wilayah = new Chart(ctxWilayah, {
+          type: 'bar',
+          data: {
+            labels: [],
+            datasets: [
+              {
+                label: 'Potensi MM Induk (≥15 th)',
+                data: [],
+                backgroundColor: '#CBD5E1',
+                hoverBackgroundColor: '#94A3B8',
+                borderRadius: 6,
+                barPercentage: 0.78,
+                categoryPercentage: 0.72
+              },
+              {
+                label: 'Terdata Survei Detail',
+                data: [],
+                backgroundColor: '#0F766E',
+                hoverBackgroundColor: '#115E59',
+                borderRadius: 6,
+                barPercentage: 0.78,
+                categoryPercentage: 0.72
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+              legend: {
+                position: 'top',
+                align: 'end',
+                labels: { usePointStyle: true, pointStyle: 'circle', boxWidth: 8, font: { size: 12, weight: '600' } }
+              },
+              tooltip: {
+                backgroundColor: '#0F172A',
+                padding: 12,
+                cornerRadius: 10,
+                callbacks: {
+                  afterBody: function (items) {
+                    if (items.length >= 2) {
+                      const potensi = items[0].parsed.y || 0;
+                      const terdata = items[1].parsed.y || 0;
+                      const pct = potensi > 0 ? ((terdata / potensi) * 100).toFixed(1).replace('.', ',') : '0,0';
+                      return `Tingkat Cakupan: ${pct}%`;
+                    }
+                    return '';
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { font: { size: 11, weight: '600' }, color: '#334155' }
+              },
+              y: {
+                beginAtZero: true,
+                grid: { color: '#F1F5F9' },
+                ticks: { font: { size: 11 } }
+              }
+            }
+          }
+        });
+
+        // 1B. Donut Chart Komposisi Aktivitas Saat Ini
+        const ctxAktivitas = document.getElementById('chartAktivitas').getContext('2d');
+        charts.aktivitas = new Chart(ctxAktivitas, {
+          type: 'doughnut',
+          data: {
+            labels: REGIONAL_STATS.aktivitas.map((a) => a.label),
+            datasets: [{
+              data: REGIONAL_STATS.aktivitas.map((a) => a.count),
+              backgroundColor: REGIONAL_STATS.aktivitas.map((a) => a.color),
+              borderColor: '#FFFFFF',
+              borderWidth: 2.5,
+              hoverOffset: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '64%',
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0F172A',
+                padding: 12,
+                cornerRadius: 10,
+                callbacks: {
+                  label: function (ctx) {
+                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                    const val = ctx.parsed;
+                    const pct = total > 0 ? ((val / total) * 100).toFixed(1).replace('.', ',') : '0,0';
+                    return ` ${ctx.label}: ${formatNumber(val)} jiwa (${pct}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        // 1C. Bar Chart Distribusi Kesiapan Menikah Skor 1-10
+        const ctxNikah = document.getElementById('chartKesiapanNikah').getContext('2d');
+        const nikahColors = REGIONAL_STATS.kesiapanMenikah.scores.map((_, idx) => {
+          const score = idx + 1;
+          if (score >= 8) return '#E11D48'; // Rose for high readiness 8-10
+          if (score >= 5) return '#0F766E'; // Deep Teal for moderate 5-7
+          return '#CBD5E1'; // Slate for early stage 1-4
+        });
+
+        charts.kesiapanNikah = new Chart(ctxNikah, {
+          type: 'bar',
+          data: {
+            labels: ['Skor 1', 'Skor 2', 'Skor 3', 'Skor 4', 'Skor 5', 'Skor 6', 'Skor 7', 'Skor 8', 'Skor 9', 'Skor 10'],
+            datasets: [{
+              label: 'Jumlah Responden Pra-Nikah',
+              data: [...REGIONAL_STATS.kesiapanMenikah.scores],
+              backgroundColor: nikahColors,
+              borderRadius: 6,
+              barPercentage: 0.72
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0F172A',
+                padding: 12,
+                cornerRadius: 10,
+                callbacks: {
+                  label: function (ctx) {
+                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                    const val = ctx.parsed.y;
+                    const pct = total > 0 ? ((val / total) * 100).toFixed(1).replace('.', ',') : '0,0';
+                    return ` ${formatNumber(val)} jiwa (${pct}%)`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                grid: { display: false },
+                ticks: { font: { size: 11, weight: '600' } }
+              },
+              y: {
+                beginAtZero: true,
+                grid: { color: '#F1F5F9' },
+                ticks: { font: { size: 11 } }
+              }
+            }
+          }
+        });
+
+        // 1D. Horizontal Bar Chart Piramida Regenerasi Generus Induk 2.310 Jiwa
+        const ctxPiramida = document.getElementById('chartPiramida').getContext('2d');
+        charts.piramida = new Chart(ctxPiramida, {
+          type: 'bar',
+          data: {
+            labels: REGIONAL_STATS.generusTiers.map((t) => t.label),
+            datasets: [{
+              label: 'Jumlah Generus Induk',
+              data: REGIONAL_STATS.generusTiers.map((t) => t.count),
+              backgroundColor: REGIONAL_STATS.generusTiers.map((t) => t.color),
+              borderRadius: 6,
+              barPercentage: 0.68
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0F172A',
+                padding: 12,
+                cornerRadius: 10,
+                callbacks: {
+                  label: function (ctx) {
+                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                    const val = ctx.parsed.x;
+                    const pct = total > 0 ? ((val / total) * 100).toFixed(1).replace('.', ',') : '0,0';
+                    return ` ${formatNumber(val)} jiwa (${pct}%)`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                beginAtZero: true,
+                grid: { color: '#F1F5F9' },
+                ticks: { font: { size: 11 } }
+              },
+              y: {
+                grid: { display: false },
+                ticks: { font: { size: 11, weight: '600' }, color: '#1E293B' }
+              }
+            }
+          }
+        });
+
+        // 2A. Top 10 Perguruan Tinggi
+        const ctxKampus = document.getElementById('chartKampus').getContext('2d');
+        charts.kampus = new Chart(ctxKampus, {
+          type: 'bar',
+          data: {
+            labels: REGIONAL_STATS.kampusTop10.map((k) => k.name),
+            datasets: [{
+              label: 'Jumlah Mahasiswa',
+              data: REGIONAL_STATS.kampusTop10.map((k) => k.count),
+              backgroundColor: REGIONAL_STATS.kampusTop10.map((_, i) => i < 2 ? '#1D4ED8' : '#3B82F6'),
+              borderRadius: 6,
+              barPercentage: 0.72
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0F172A',
+                padding: 12,
+                cornerRadius: 10,
+                callbacks: {
+                  label: function (ctx) {
+                    const val = ctx.parsed.x;
+                    const pct = ((val / 246) * 100).toFixed(1).replace('.', ',');
+                    return ` ${val} Mahasiswa (${pct}% dari 246 total mahasiswa)`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                beginAtZero: true,
+                grid: { color: '#F1F5F9' },
+                ticks: { font: { size: 11 } }
+              },
+              y: {
+                grid: { display: false },
+                ticks: { font: { size: 11, weight: '600' }, color: '#1E293B' }
+              }
+            }
+          }
+        });
+
+        // 2B. Jenjang Studi Mahasiswa
+        const ctxJenjang = document.getElementById('chartJenjang').getContext('2d');
+        charts.jenjang = new Chart(ctxJenjang, {
+          type: 'doughnut',
+          data: {
+            labels: REGIONAL_STATS.jenjangStudi.map((j) => j.label),
+            datasets: [{
+              data: REGIONAL_STATS.jenjangStudi.map((j) => j.count),
+              backgroundColor: REGIONAL_STATS.jenjangStudi.map((j) => j.color),
+              borderColor: '#FFFFFF',
+              borderWidth: 2.5,
+              hoverOffset: 5
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+              legend: {
+                position: 'right',
+                labels: { usePointStyle: true, pointStyle: 'circle', boxWidth: 8, font: { size: 11, weight: '600' } }
+              },
+              tooltip: {
+                backgroundColor: '#0F172A',
+                padding: 12,
+                cornerRadius: 10,
+                callbacks: {
+                  label: function (ctx) {
+                    const val = ctx.parsed;
+                    const pct = ((val / 246) * 100).toFixed(1).replace('.', ',');
+                    return ` ${ctx.label}: ${val} Mahasiswa (${pct}%)`;
+                  }
+                }
+              }
+            }
+          }
+        });
+
+        // 2C. Pemetaan Kategori Hobi
+        const ctxHobi = document.getElementById('chartHobi').getContext('2d');
+        charts.hobi = new Chart(ctxHobi, {
+          type: 'bar',
+          data: {
+            labels: REGIONAL_STATS.hobi.map((h) => h.label),
+            datasets: [{
+              label: 'Jumlah Peminat',
+              data: REGIONAL_STATS.hobi.map((h) => h.count),
+              backgroundColor: REGIONAL_STATS.hobi.map((h) => h.color),
+              borderRadius: 8,
+              barPercentage: 0.62
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0F172A',
+                padding: 12,
+                cornerRadius: 10,
+                callbacks: {
+                  label: function (ctx) {
+                    return ` ${formatNumber(ctx.parsed.x)} jiwa`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                beginAtZero: true,
+                grid: { color: '#F1F5F9' }
+              },
+              y: {
+                grid: { display: false },
+                ticks: { font: { size: 12, weight: '600' }, color: '#1E293B' }
+              }
+            }
+          }
+        });
+
+        // 2D. Pemetaan Kategori Skill / Cita-Cita
+        const ctxSkill = document.getElementById('chartSkill').getContext('2d');
+        charts.skill = new Chart(ctxSkill, {
+          type: 'bar',
+          data: {
+            labels: REGIONAL_STATS.skill.map((s) => s.label),
+            datasets: [{
+              label: 'Jumlah Talenta',
+              data: REGIONAL_STATS.skill.map((s) => s.count),
+              backgroundColor: REGIONAL_STATS.skill.map((s) => s.color),
+              borderRadius: 8,
+              barPercentage: 0.62
+            }]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                backgroundColor: '#0F172A',
+                padding: 12,
+                cornerRadius: 10,
+                callbacks: {
+                  label: function (ctx) {
+                    const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                    const pct = ((ctx.parsed.x / total) * 100).toFixed(1).replace('.', ',');
+                    return ` ${formatNumber(ctx.parsed.x)} jiwa (${pct}%)`;
+                  }
+                }
+              }
+            },
+            scales: {
+              x: {
+                beginAtZero: true,
+                grid: { color: '#F1F5F9' }
+              },
+              y: {
+                grid: { display: false },
+                ticks: { font: { size: 12, weight: '600' }, color: '#1E293B' }
+              }
+            }
+          }
+        });
+      }
+
+      // Dynamic Chart Updates on Filter Change
+      function updateDynamicCharts(filteredRows) {
+        const isAll = state.selectedDesa === 'ALL' && state.selectedKelompok === 'ALL';
+
+        // 1. Update Chart Wilayah (By Desa when ALL, or by Kelompok when a Desa is selected)
+        if (state.selectedDesa === 'ALL') {
+          const desas = [...new Set(KELOMPOK_DATA.map((d) => d.desa))];
+          const labels = desas;
+          const potensiArr = desas.map((d) =>
+            KELOMPOK_DATA.filter((r) => r.desa === d).reduce((s, r) => s + r.potensiMM, 0)
+          );
+          const terdataArr = desas.map((d) =>
+            KELOMPOK_DATA.filter((r) => r.desa === d).reduce((s, r) => s + r.terdataDetail, 0)
+          );
+
+          document.getElementById('chartWilayahTitle').textContent = 'Potensi MM Induk vs Terdata Detail per Desa';
+          document.getElementById('chartWilayahSubtitle').textContent = 'Perbandingan target potensi usia ≥15 tahun dengan realisasi survei detail (8 Desa)';
+
+          charts.wilayah.data.labels = labels;
+          charts.wilayah.data.datasets[0].data = potensiArr;
+          charts.wilayah.data.datasets[1].data = terdataArr;
+          charts.wilayah.update();
+        } else {
+          // Group by Kelompok within the selected Desa
+          const rows = filteredRows;
+          document.getElementById('chartWilayahTitle').textContent = `Potensi MM Induk vs Terdata Detail — Desa ${state.selectedDesa}`;
+          document.getElementById('chartWilayahSubtitle').textContent = `Rincian per kelompok pada wilayah Desa ${state.selectedDesa}`;
+
+          charts.wilayah.data.labels = rows.map((r) => r.kelompok);
+          charts.wilayah.data.datasets[0].data = rows.map((r) => r.potensiMM);
+          charts.wilayah.data.datasets[1].data = rows.map((r) => r.terdataDetail);
+          charts.wilayah.update();
+        }
+
+        // 2. Update Donut Chart Komposisi Aktivitas & Custom Legend
+        let aktivitasItems = [];
+        if (isAll) {
+          aktivitasItems = REGIONAL_STATS.aktivitas;
+          document.getElementById('chartAktivitasSubtitle').textContent = 'Distribusi kesibukan utama 896 responden muda-mudi';
+        } else {
+          const sumTerdata = filteredRows.reduce((s, r) => s + r.terdataDetail, 0);
+          const sumKerja = filteredRows.reduce((s, r) => s + r.kerja, 0);
+          const sumPendidikan = filteredRows.reduce((s, r) => s + r.kuliahSekolah, 0);
+          const sumMencari = filteredRows.reduce((s, r) => s + r.mencariKerja, 0);
+          const sisaLainnya = Math.max(0, sumTerdata - (sumKerja + sumPendidikan + sumMencari));
+
+          aktivitasItems = [
+            { label: 'Kerja / Usaha / MT', count: sumKerja, color: '#0F766E' },
+            { label: 'Kuliah / Sekolah', count: sumPendidikan, color: '#2563EB' },
+            { label: 'Sedang Mencari Kerja', count: sumMencari, color: '#D97706' },
+            { label: 'Lainnya / Belum Bekerja', count: sisaLainnya, color: '#94A3B8' }
+          ];
+          document.getElementById('chartAktivitasSubtitle').textContent = `Komposisi aktivitas ${formatNumber(sumTerdata)} responden terfilter`;
+        }
+
+        const totalAkt = aktivitasItems.reduce((s, a) => s + a.count, 0);
+        charts.aktivitas.data.labels = aktivitasItems.map((a) => a.label);
+        charts.aktivitas.data.datasets[0].data = aktivitasItems.map((a) => a.count);
+        charts.aktivitas.data.datasets[0].backgroundColor = aktivitasItems.map((a) => a.color);
+        charts.aktivitas.update();
+
+        const legendContainer = document.getElementById('aktivitasLegend');
+        legendContainer.innerHTML = aktivitasItems.map((item) => {
+          const pct = totalAkt > 0 ? ((item.count / totalAkt) * 100).toFixed(1).replace('.', ',') : '0,0';
+          return `
+            <div class="flex items-center justify-between gap-1.5 py-0.5">
+              <div class="flex items-center gap-1.5 min-w-0">
+                <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background-color: ${item.color}"></span>
+                <span class="truncate text-slate-600" title="${item.label}">${item.label}</span>
+              </div>
+              <span class="font-bold text-slate-800 shrink-0">${formatNumber(item.count)} <span class="font-normal text-slate-400">(${pct}%)</span></span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // -----------------------------------------------------------------------
+      // 7. RENDER EVALUASI 44 KELOMPOK TABLE (TAB 3)
+      // -----------------------------------------------------------------------
+      function renderKelompokTable() {
+        const baseRows = getFilteredKelompoks();
+        const query = state.tableSearch.trim().toLowerCase();
+
+        const searchedRows = baseRows.filter((row) => {
+          const matchesQuery = !query ||
+            row.desa.toLowerCase().includes(query) ||
+            row.kelompok.toLowerCase().includes(query);
+
+          let matchesStatus = true;
+          if (state.tableStatusFilter === 'HIGH') matchesStatus = row.cakupanPct >= 80;
+          else if (state.tableStatusFilter === 'MED') matchesStatus = row.cakupanPct >= 60 && row.cakupanPct < 80;
+          else if (state.tableStatusFilter === 'LOW') matchesStatus = row.cakupanPct < 60;
+
+          return matchesQuery && matchesStatus;
+        });
+
+        // Sort
+        searchedRows.sort((a, b) => {
+          let valA = a[state.sortKey];
+          let valB = b[state.sortKey];
+          if (typeof valA === 'string') {
+            return state.sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+          }
+          return state.sortAsc ? valA - valB : valB - valA;
+        });
+
+        const tbody = document.getElementById('kelompokTableBody');
+        const tfoot = document.getElementById('kelompokTableFoot');
+
+        if (searchedRows.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="11" class="px-6 py-10 text-center text-slate-500">
+                Tidak ada data kelompok yang sesuai dengan kriteria pencarian atau filter saat ini.
+              </td>
+            </tr>
+          `;
+          tfoot.innerHTML = '';
+          return;
+        }
+
+        tbody.innerHTML = searchedRows.map((row, index) => {
+          let badgeStyle = 'bg-rose-100 text-rose-800 border-rose-200';
+          if (row.cakupanPct >= 80) {
+            badgeStyle = 'bg-emerald-100 text-emerald-800 border-emerald-200';
+          } else if (row.cakupanPct >= 60) {
+            badgeStyle = 'bg-amber-100 text-amber-800 border-amber-200';
+          }
+
+          return `
+            <tr class="hover:bg-slate-50/90 transition-colors">
+              <td class="px-4 py-3 text-slate-400 font-medium">${index + 1}</td>
+              <td class="px-4 py-3 font-semibold text-slate-700 whitespace-nowrap">${row.desa}</td>
+              <td class="px-4 py-3 font-bold text-slate-900 whitespace-nowrap">${row.kelompok}</td>
+              <td class="px-3 py-3 text-right font-medium text-slate-700">${formatNumber(row.totalGenerus)}</td>
+              <td class="px-3 py-3 text-right font-medium text-slate-700">${formatNumber(row.potensiMM)}</td>
+              <td class="px-3 py-3 text-right font-bold text-[#0F766E]">${formatNumber(row.terdataDetail)}</td>
+              <td class="px-4 py-3 text-center whitespace-nowrap">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border ${badgeStyle}">
+                  ${formatPercent(row.cakupanPct)}
+                </span>
+              </td>
+              <td class="px-3 py-3 text-right font-medium text-emerald-700">${formatNumber(row.kerja)}</td>
+              <td class="px-3 py-3 text-right font-medium text-[#2563EB]">${formatNumber(row.kuliahSekolah)}</td>
+              <td class="px-3 py-3 text-right font-semibold ${row.mencariKerja >= 4 ? 'text-[#D97706]' : 'text-slate-600'}">
+                ${formatNumber(row.mencariKerja)}
+              </td>
+              <td class="px-4 py-3 text-right font-semibold ${row.siapNikah >= 5 ? 'text-[#E11D48]' : 'text-slate-600'}">
+                ${formatNumber(row.siapNikah)}
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+        // Summary Footer
+        const totGenerus = searchedRows.reduce((s, r) => s + r.totalGenerus, 0);
+        const totPotensi = searchedRows.reduce((s, r) => s + r.potensiMM, 0);
+        const totTerdata = searchedRows.reduce((s, r) => s + r.terdataDetail, 0);
+        const totCakupan = totPotensi > 0 ? (totTerdata / totPotensi) * 100 : 0;
+        const totKerja = searchedRows.reduce((s, r) => s + r.kerja, 0);
+        const totKuliah = searchedRows.reduce((s, r) => s + r.kuliahSekolah, 0);
+        const totMencari = searchedRows.reduce((s, r) => s + r.mencariKerja, 0);
+        const totSiap = searchedRows.reduce((s, r) => s + r.siapNikah, 0);
+
+        tfoot.innerHTML = `
+          <tr>
+            <td colspan="3" class="px-4 py-3.5 text-left text-xs uppercase tracking-wider text-teal-900">
+              Total Rekapitulasi (${searchedRows.length} Kelompok)
+            </td>
+            <td class="px-3 py-3.5 text-right">${formatNumber(totGenerus)}</td>
+            <td class="px-3 py-3.5 text-right">${formatNumber(totPotensi)}</td>
+            <td class="px-3 py-3.5 text-right text-[#0F766E]">${formatNumber(totTerdata)}</td>
+            <td class="px-4 py-3.5 text-center">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-[#0F766E] text-white">
+                ${formatPercent(totCakupan)}
+              </span>
+            </td>
+            <td class="px-3 py-3.5 text-right text-emerald-800">${formatNumber(totKerja)}</td>
+            <td class="px-3 py-3.5 text-right text-[#2563EB]">${formatNumber(totKuliah)}</td>
+            <td class="px-3 py-3.5 text-right text-[#D97706]">${formatNumber(totMencari)}</td>
+            <td class="px-4 py-3.5 text-right text-[#E11D48]">${formatNumber(totSiap)}</td>
+          </tr>
+        `;
+      }
+
+      // -----------------------------------------------------------------------
+      // 8. CSV EXPORT ENGINE (UTF-8 BOM FOR EXCEL COMPATIBILITY)
+      // -----------------------------------------------------------------------
+      function exportToCSV(rows, filename) {
+        const headers = [
+          'No',
+          'Desa',
+          'Kelompok',
+          'Total_Generus_Induk',
+          'Potensi_MM_Induk',
+          'Terdata_Detail',
+          'Persentase_Cakupan',
+          'Kerja_Usaha_MT',
+          'Kuliah_Sekolah',
+          'Sedang_Mencari_Kerja',
+          'Siap_Nikah_Skor_8_10'
+        ];
+
+        const csvLines = [headers.join(',')];
+        rows.forEach((r, idx) => {
+          const line = [
+            idx + 1,
+            `"${r.desa}"`,
+            `"${r.kelompok}"`,
+            r.totalGenerus,
+            r.potensiMM,
+            r.terdataDetail,
+            `"${r.cakupanPct.toFixed(1)}%"`,
+            r.kerja,
+            r.kuliahSekolah,
+            r.mencariKerja,
+            r.siapNikah
+          ];
+          csvLines.push(line.join(','));
+        });
+
+        const csvContent = '\uFEFF' + csvLines.join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        showToast(`Berhasil mengunduh file ${filename} (${rows.length} kelompok)`);
+      }
+
+      // -----------------------------------------------------------------------
+      // 9. TAB SWITCHING & MASTER REFRESH
+      // -----------------------------------------------------------------------
+      function switchTab(tabId) {
+        state.activeTab = tabId;
+        document.querySelectorAll('.tab-btn').forEach((btn) => {
+          const isSelected = btn.getAttribute('data-tab') === tabId;
+          btn.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+          if (isSelected) {
+            btn.className = 'tab-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-bold transition-all cursor-pointer bg-[#0F766E] text-white shadow-sm';
+          } else {
+            btn.className = 'tab-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all cursor-pointer text-slate-600 hover:bg-slate-100 hover:text-slate-900';
+          }
+        });
+
+        ['1', '2', '3'].forEach((id) => {
+          const panel = document.getElementById(`tabPanel${id}`);
+          if (id === tabId) {
+            panel.classList.remove('hidden');
+          } else {
+            panel.classList.add('hidden');
+          }
+        });
+
+        // Ensure Chart.js canvases resize cleanly after becoming visible
+        requestAnimationFrame(() => {
+          Object.values(charts).forEach((chart) => {
+            if (chart) chart.resize();
+          });
+        });
+      }
+
+      function refreshDashboard() {
+        const filteredRows = getFilteredKelompoks();
+        updateKPIs(filteredRows);
+        updateDynamicCharts(filteredRows);
+        renderKelompokTable();
+      }
+
+      // -----------------------------------------------------------------------
+      // 10. EVENT LISTENERS & INITIALIZATION
+      // -----------------------------------------------------------------------
+      window.addEventListener('DOMContentLoaded', () => {
+        populateDesaFilter();
+        populateKelompokFilter();
+        initCharts();
+        refreshDashboard();
+
+        // Filter Desa change
+        document.getElementById('filterDesa').addEventListener('change', (e) => {
+          state.selectedDesa = e.target.value;
+          state.selectedKelompok = 'ALL';
+          populateKelompokFilter();
+          refreshDashboard();
+        });
+
+        // Filter Kelompok change
+        document.getElementById('filterKelompok').addEventListener('change', (e) => {
+          state.selectedKelompok = e.target.value;
+          refreshDashboard();
+        });
+
+        // Reset Filter button
+        document.getElementById('btnResetFilter').addEventListener('click', () => {
+          state.selectedDesa = 'ALL';
+          state.selectedKelompok = 'ALL';
+          state.tableSearch = '';
+          state.tableStatusFilter = 'ALL';
+
+          document.getElementById('filterDesa').value = 'ALL';
+          document.getElementById('tableSearchInput').value = '';
+          populateKelompokFilter();
+
+          document.querySelectorAll('.status-chip').forEach((chip) => {
+            if (chip.getAttribute('data-status') === 'ALL') {
+              chip.className = 'status-chip px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-white cursor-pointer transition';
+            } else if (chip.getAttribute('data-status') === 'HIGH') {
+              chip.className = 'status-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 cursor-pointer transition';
+            } else if (chip.getAttribute('data-status') === 'MED') {
+              chip.className = 'status-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 cursor-pointer transition';
+            } else {
+              chip.className = 'status-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100 cursor-pointer transition';
+            }
+          });
+
+          refreshDashboard();
+          showToast('Filter wilayah berhasil direset ke seluruh daerah');
+        });
+
+        // Tab buttons
+        document.querySelectorAll('.tab-btn').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            switchTab(btn.getAttribute('data-tab'));
+          });
+        });
+
+        // Table search
+        document.getElementById('tableSearchInput').addEventListener('input', (e) => {
+          state.tableSearch = e.target.value;
+          renderKelompokTable();
+        });
+
+        // Table status chips
+        document.querySelectorAll('.status-chip').forEach((chip) => {
+          chip.addEventListener('click', () => {
+            state.tableStatusFilter = chip.getAttribute('data-status');
+            document.querySelectorAll('.status-chip').forEach((c) => {
+              const st = c.getAttribute('data-status');
+              const active = st === state.tableStatusFilter;
+              if (st === 'ALL') {
+                c.className = active
+                  ? 'status-chip px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-white cursor-pointer transition'
+                  : 'status-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 cursor-pointer transition';
+              } else if (st === 'HIGH') {
+                c.className = active
+                  ? 'status-chip px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-700 text-white cursor-pointer transition'
+                  : 'status-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 cursor-pointer transition';
+              } else if (st === 'MED') {
+                c.className = active
+                  ? 'status-chip px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-600 text-white cursor-pointer transition'
+                  : 'status-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 hover:bg-amber-100 cursor-pointer transition';
+              } else {
+                c.className = active
+                  ? 'status-chip px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-600 text-white cursor-pointer transition'
+                  : 'status-chip px-3 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100 cursor-pointer transition';
+              }
+            });
+            renderKelompokTable();
+          });
+        });
+
+        // Sortable table headers
+        document.querySelectorAll('.sortable-th').forEach((th) => {
+          th.addEventListener('click', () => {
+            const key = th.getAttribute('data-sort');
+            if (state.sortKey === key) {
+              state.sortAsc = !state.sortAsc;
+            } else {
+              state.sortKey = key;
+              state.sortAsc = key === 'desa' || key === 'kelompok';
+            }
+            renderKelompokTable();
+          });
+        });
+
+        // Export CSV buttons (Header & Table)
+        document.getElementById('btnExportGlobalCSV').addEventListener('click', () => {
+          const rows = getFilteredKelompoks();
+          const suffix = state.selectedDesa === 'ALL' ? 'Semua_Desa' : state.selectedDesa.replace(/\s+/g, '_');
+          exportToCSV(rows, `Rekap_Muda_Mudi_Bogor_Selatan_1_2026_${suffix}.csv`);
+        });
+
+        document.getElementById('btnExportTableCSV').addEventListener('click', () => {
+          const rows = getFilteredKelompoks();
+          const suffix = state.selectedDesa === 'ALL' ? '44_Kelompok' : state.selectedDesa.replace(/\s+/g, '_');
+          exportToCSV(rows, `Evaluasi_Kelompok_Bogor_Selatan_1_2026_${suffix}.csv`);
+        });
+
+        // Print / PDF button
+        document.getElementById('btnPrintPDF').addEventListener('click', () => {
+          window.print();
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
